@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script lang="ts">
+      window.onload = () => {
+        const mainCanvas = document.getElementById("mainCanvas");
+        const ctx = mainCanvas.getContext("2d");
+        const fileInput = document.getElementById("fileInput");
+        fileInput.addEventListener("change", async () => {
+          ctx.clearRect(0, 0, 320, 320);
+          const fileArray = await fileInput.files[0].arrayBuffer();
+          console.log(fileArray);
+          const sha256Digest = await crypto.subtle.digest("SHA-256", fileArray);
+          console.log(sha256Digest);
+          const fileUint16 = new Uint16Array(sha256Digest);
+          console.log(fileUint16);
+          for (let i = 0; i < 16; i++) {
+            for (let j = 0; j < 16; j++) {
+              const fillFlag = (fileUint16[i] & (1 << (16 - j))) >> (16 - j);
+              if (fillFlag) {
+                ctx.fillRect(20 * j, 20 * i, 20, 20);
+              }
+            }
+          }
+        });
+      };
+    </script>
+    <title>HashFlower</title>
+  </head>
+  <body>
+    <input type="file" id="fileInput" />
+    <canvas height="320" width="320" id="mainCanvas"> </canvas>
+  </body>
+</html>
